@@ -1,0 +1,112 @@
+
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+<!DOCTYPE html>
+
+        <div class="flashcard" id="flashcard">
+          <div class="flashcard-inner" id="flashcard-inner">
+            <div class="flashcard-front">
+              <div class="card-label">Latein</div>
+              <div class="card-word" id="latin-word">-</div>
+              <div class="card-forms" id="latin-forms"></div>
+              <div class="card-hint">Klicken zum Aufdecken</div>
+            </div>
+            <div class="flashcard-back">
+              <div class="card-label">Deutsch</div>
+              <div class="card-word" id="german-word">-</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="answer-buttons hidden" id="answer-buttons">
+          <button class="btn btn-danger" id="unknown-btn">❌ Nicht gewusst</button>
+          <button class="btn btn-success" id="known-btn">✓ Gewusst</button>
+        </div>
+      </div>
+
+      <!-- Results -->
+      <div id="results-view" class="hidden">
+        <div class="results-card">
+          <h2>🎉 Übung abgeschlossen!</h2>
+          <div class="results-stats">
+            <div class="result-item">
+              <span class="result-value" id="result-total">0</span>
+              <span class="result-label">Vokabeln</span>
+            </div>
+            <div class="result-item success">
+              <span class="result-value" id="result-known">0</span>
+              <span class="result-label">Gewusst</span>
+            </div>
+            <div class="result-item danger">
+              <span class="result-value" id="result-unknown">0</span>
+              <span class="result-label">Nicht gewusst</span>
+            </div>
+          </div>
+          <div class="result-percentage">
+            <span id="result-percentage">0%</span> Erfolgsquote
+          </div>
+          <div class="result-actions">
+            <button class="btn btn-secondary" id="practice-again-btn">Nochmal üben</button>
+            <button class="btn btn-primary" id="back-home-btn">Zur Übersicht</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
