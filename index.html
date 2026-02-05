@@ -1,60 +1,95 @@
-
-94
-95
-96
-97
-98
-99
-100
-101
-102
-103
-104
-105
-106
-107
-108
-109
-110
-111
-112
-113
-114
-115
-116
-117
-118
-119
-120
-121
-122
-123
-124
-125
-126
-127
-128
-129
-130
-131
-132
-133
-134
-135
-136
-137
-138
-139
-140
-141
-142
-143
-144
-145
-146
-147
-148
 <!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Latein Vokabeltrainer</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <h1>🎓 Latein Vokabeltrainer</h1>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Home View -->
+    <div id="home-view">
+      <div class="hero">
+        <div class="hero-icon">🎓</div>
+        <h2>Latein Vokabeln meistern</h2>
+        <p>Lade deine Vokabeln hoch und lerne sie mit dem bewährten Karteikarten-System.</p>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-grid" id="stats-container">
+        <div class="stat-card">
+          <div class="stat-value" id="stat-total">0</div>
+          <div class="stat-label">Vokabeln gesamt</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-practiced">0</div>
+          <div class="stat-label">Geübt</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-known">0</div>
+          <div class="stat-label">Gewusst</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-percentage">0%</div>
+          <div class="stat-label">Erfolgsquote</div>
+        </div>
+      </div>
+
+      <!-- Start Button -->
+      <div class="center">
+        <button class="btn btn-primary btn-large" id="start-btn">
+          🎓 Üben starten
+        </button>
+      </div>
+
+      <!-- CSV Upload -->
+      <div class="upload-section">
+        <h3>📁 Vokabeln hochladen</h3>
+        <p>CSV-Datei mit 4 Spalten: Lateinisches Wort, Formen, Deutsche Übersetzung, Lektionsnummer</p>
+        <input type="file" id="csv-input" accept=".csv" />
+        <div id="upload-status"></div>
+      </div>
+    </div>
+
+    <!-- Lesson Selection View -->
+    <div id="select-view" class="hidden">
+      <button class="btn btn-ghost" id="back-to-home">← Zurück zur Übersicht</button>
+      
+      <div class="lesson-selector">
+        <h2>Lektionen auswählen</h2>
+        <p>Wähle die Lektionen aus, die du üben möchtest:</p>
+        
+        <div class="lesson-controls">
+          <button class="btn btn-secondary" id="select-all-btn">Alle auswählen</button>
+          <button class="btn btn-secondary" id="deselect-all-btn">Alle abwählen</button>
+        </div>
+        
+        <div id="lessons-grid" class="lessons-grid"></div>
+        
+        <button class="btn btn-primary btn-large" id="start-practice-btn" disabled>
+          Üben starten
+        </button>
+      </div>
+    </div>
+
+    <!-- Practice View -->
+    <div id="practice-view" class="hidden">
+      <button class="btn btn-ghost" id="back-to-select">← Zurück zur Auswahl</button>
+      
+      <div class="practice-container">
+        <div class="progress-info">
+          <span id="progress-text">Karte 1 von 10</span>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill"></div>
+          </div>
+        </div>
 
         <div class="flashcard" id="flashcard">
           <div class="flashcard-inner" id="flashcard-inner">
