@@ -11,13 +11,16 @@ let currentCardIndex = 0;
 let sessionResults = { known: 0, unknown: 0 };
 
 // DOM Elements
-const homeView = document.getElementById("home-view");
-const selectView = document.getElementById("select-view");
-const practiceView = document.getElementById("practice-view");
-const resultsView = document.getElementById("results-view");
+let homeView, selectView, practiceView, resultsView;
 
 // Initialize
 document.addEventListener("DOMContentLoaded", () => {
+  // Get DOM elements after page load
+  homeView = document.getElementById("home-view");
+  selectView = document.getElementById("select-view");
+  practiceView = document.getElementById("practice-view");
+  resultsView = document.getElementById("results-view");
+  
   loadData();
   updateStats();
   setupEventListeners();
@@ -255,14 +258,23 @@ function startPractice() {
     .filter(v => selectedLessons.includes(v.lesson_number))
     .sort(() => Math.random() - 0.5);
   
+  // Check if there are cards to practice
+  if (currentPracticeCards.length === 0) {
+    alert("Keine Vokabeln in den ausgewählten Lektionen gefunden.");
+    return;
+  }
+  
   currentCardIndex = 0;
   sessionResults = { known: 0, unknown: 0 };
   
-  // Reset visibility
-  document.querySelector(".practice-container").classList.remove("hidden");
-  resultsView.classList.add("hidden");
-  
   showPracticeView();
+  
+  // Reset visibility after view is shown
+  const practiceContainer = document.querySelector(".practice-container");
+  const resultsViewEl = document.getElementById("results-view");
+  if (practiceContainer) practiceContainer.classList.remove("hidden");
+  if (resultsViewEl) resultsViewEl.classList.add("hidden");
+  
   showCard();
 }
 
@@ -325,8 +337,11 @@ function answerCard(known) {
 
 // Results
 function showResults() {
-  document.querySelector(".practice-container").classList.add("hidden");
-  resultsView.classList.remove("hidden");
+  const practiceContainer = document.querySelector(".practice-container");
+  const resultsViewEl = document.getElementById("results-view");
+  
+  if (practiceContainer) practiceContainer.classList.add("hidden");
+  if (resultsViewEl) resultsViewEl.classList.remove("hidden");
   
   const total = sessionResults.known + sessionResults.unknown;
   const percentage = total > 0 ? Math.round((sessionResults.known / total) * 100) : 0;
