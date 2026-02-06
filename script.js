@@ -99,12 +99,21 @@ function handleCSVUpload(event) {
       for (let i = startIndex; i < lines.length; i++) {
         const parts = parseCSVLine(lines[i]);
         if (parts.length >= 4) {
+          const lessonStr = parts[3].trim();
+          const lessonNum = parseInt(lessonStr, 10);
+          
+          // Skip if lesson number is invalid
+          if (isNaN(lessonNum)) {
+            console.warn(`Zeile ${i + 1} übersprungen: Ungültige Lektionsnummer "${lessonStr}"`);
+            continue;
+          }
+          
           newVocabs.push({
             id: generateId(),
             latin_word: parts[0].trim(),
             forms: parts[1].trim() || null,
             german_translation: parts[2].trim(),
-            lesson_number: parseInt(parts[3].trim()) || 1,
+            lesson_number: lessonNum,
             created_at: new Date().toISOString()
           });
         }
@@ -248,6 +257,10 @@ function startPractice() {
   
   currentCardIndex = 0;
   sessionResults = { known: 0, unknown: 0 };
+  
+  // Reset visibility
+  document.querySelector(".practice-container").classList.remove("hidden");
+  resultsView.classList.add("hidden");
   
   showPracticeView();
   showCard();
