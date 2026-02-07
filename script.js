@@ -105,10 +105,19 @@ function handleCSVUpload(event) {
       const startIndex = lines[0].toLowerCase().includes("latein") ? 1 : 0;
       
       const newVocabs = [];
+      console.log(`CSV: ${lines.length} Zeilen gefunden, starte bei Zeile ${startIndex}`);
+      
       for (let i = startIndex; i < lines.length; i++) {
-        const parts = parseCSVLine(lines[i]);
+        const line = lines[i].trim();
+        if (!line) continue; // Skip empty lines
+        
+        const parts = parseCSVLine(line);
+        console.log(`Zeile ${i + 1}:`, parts);
+        
         if (parts.length >= 4) {
-          const lessonStr = parts[3].trim();
+          // IMPORTANT: Always take the LAST element as lesson number
+          // because translations may contain unquoted semicolons that create extra parts
+          const lessonStr = parts[parts.length - 1].trim();
           const lessonNum = parseInt(lessonStr, 10);
           
           // Skip if lesson number is invalid
@@ -117,14 +126,21 @@ function handleCSVUpload(event) {
             continue;
           }
           
+          // Combine all middle parts as the German translation (in case of extra splits)
+          const germanParts = parts.slice(2, parts.length - 1);
+          const germanTranslation = germanParts.join("; ").trim();
+          
           newVocabs.push({
             id: generateId(),
             latin_word: parts[0].trim(),
             forms: parts[1].trim() || null,
-            german_translation: parts[2].trim(),
+            german_translation: germanTranslation,
             lesson_number: lessonNum,
             created_at: new Date().toISOString()
           });
+          console.log(`✓ Vokabel hinzugefügt: ${parts[0]} (Lektion ${lessonNum})`);
+        } else {
+          console.warn(`Zeile ${i + 1} übersprungen: Nur ${parts.length} Teile gefunden (brauche mindestens 4)`);
         }
       }
       
@@ -153,19 +169,39 @@ function parseCSVLine(line) {
   
   for (let i = 0; i < line.length; i++) {
     const char = line[i];
+    const nextChar = line[i + 1];
     
     if (char === '"') {
-      inQuotes = !inQuotes;
+      // Handle escaped quotes ("") inside quoted fields
+      if (inQuotes && nextChar === '"') {
+        current += '"';
+        i++; // Skip the next quote
+      } else {
+        inQuotes = !inQuotes;
+      }
     } else if ((char === "," || char === ";") && !inQuotes) {
-      result.push(current);
+      result.push(current.trim());
       current = "";
     } else {
       current += char;
     }
   }
-  result.push(current);
+  // Don't forget the last field
+  if (current.length > 0 || result.length > 0) {
+    result.push(current.trim());
+  }
   
+  // Clean up quotes and whitespace
   return result.map(s => s.replace(/^"|"$/g, "").trim());
+}
+
+// Debug function to log parsing results (can be removed in production)
+function debugParseLine(line) {
+  const parts = parseCSVLine(line);
+  console.log("Parsing line:", line);
+  console.log("Result:", parts);
+  console.log("Parts count:", parts.length);
+  return parts;
 }
 
 function showUploadStatus(message, type) {
