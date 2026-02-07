@@ -8,7 +8,7 @@ let practiceResults = [];
 let selectedLessons = [];
 let currentPracticeCards = [];
 let currentCardIndex = 0;
-let sessionResults = { known: 0, unknown: 0 };
+let sessionResults = { known: 0, unknown: 0, wrongCards: [] };
 
 // DOM Elements
 let homeView, selectView, practiceView, resultsView;
@@ -48,6 +48,7 @@ function updateStats() {
   const total = vocabularies.length;
   const practiced = practiceResults.length;
   const known = practiceResults.filter(r => r.known).length;
+  const unknown = practiced - known;
   const percentage = practiced > 0 ? Math.round((known / practiced) * 100) : 0;
   
   document.getElementById("stat-total").textContent = total;
@@ -57,6 +58,66 @@ function updateStats() {
   
   // Enable/disable start button
   document.getElementById("start-btn").disabled = total === 0;
+  
+  // Update lesson stats
+  updateLessonStats();
+}
+
+function updateLessonStats() {
+  const lessonStatsContainer = document.getElementById("lesson-stats");
+  if (!lessonStatsContainer) return;
+  
+  // Get unique lessons
+  const lessonMap = new Map();
+  vocabularies.forEach(v => {
+    if (!lessonMap.has(v.lesson_number)) {
+      lessonMap.set(v.lesson_number, { total: 0, known: 0, unknown: 0 });
+    }
+    const stats = lessonMap.get(v.lesson_number);
+    stats.total++;
+  });
+  
+  // Count practice results per lesson (only last result per vocabulary)
+  const lastResultPerVocab = new Map();
+  practiceResults.forEach(r => {
+    lastResultPerVocab.set(r.vocabulary_id, r.known);
+  });
+  
+  vocabularies.forEach(v => {
+    if (lastResultPerVocab.has(v.id)) {
+      const stats = lessonMap.get(v.lesson_number);
+      if (lastResultPerVocab.get(v.id)) {
+        stats.known++;
+      } else {
+        stats.unknown++;
+      }
+    }
+  });
+  
+  const lessons = Array.from(lessonMap.entries()).sort((a, b) => a[0] - b[0]);
+  
+  if (lessons.length === 0) {
+    lessonStatsContainer.innerHTML = '<p class="no-stats">Noch keine Vokabeln geladen.</p>';
+    return;
+  }
+  
+  lessonStatsContainer.innerHTML = lessons.map(([num, stats]) => {
+    const practiced = stats.known + stats.unknown;
+    const percentage = practiced > 0 ? Math.round((stats.known / practiced) * 100) : 0;
+    const progressWidth = stats.total > 0 ? Math.round((stats.known / stats.total) * 100) : 0;
+    
+    return `
+      <div class="lesson-stat-row">
+        <div class="lesson-stat-header">
+          <span class="lesson-stat-name">Lektion ${num}</span>
+          <span class="lesson-stat-numbers">${stats.known}/${stats.total} (${progressWidth}%)</span>
+        </div>
+        <div class="lesson-stat-bar">
+          <div class="lesson-stat-fill" style="width: ${progressWidth}%"></div>
+        </div>
+      </div>
+    `;
+  }).join("");
 }
 
 // Event Listeners
@@ -87,6 +148,7 @@ function setupEventListeners() {
       startPractice();
     }
   });
+  document.getElementById("practice-wrong-btn").addEventListener("click", practiceWrongCards);
   document.getElementById("back-home-btn").addEventListener("click", showHomeView);
 }
 
@@ -308,7 +370,7 @@ function startPractice() {
   }
   
   currentCardIndex = 0;
-  sessionResults = { known: 0, unknown: 0 };
+  sessionResults = { known: 0, unknown: 0, wrongCards: [] };
   
   showPracticeView();
   
@@ -371,6 +433,7 @@ function answerCard(known) {
     sessionResults.known++;
   } else {
     sessionResults.unknown++;
+    sessionResults.wrongCards.push(card);
   }
   
   // Next card
@@ -394,6 +457,38 @@ function showResults() {
   document.getElementById("result-unknown").textContent = sessionResults.unknown;
   document.getElementById("result-percentage").textContent = percentage + "%";
   
+  // Show/hide "practice wrong" button based on whether there are wrong cards
+  const practiceWrongBtn = document.getElementById("practice-wrong-btn");
+  if (practiceWrongBtn) {
+    if (sessionResults.wrongCards.length > 0) {
+      practiceWrongBtn.classList.remove("hidden");
+      practiceWrongBtn.textContent = `🔄 Falsche wiederholen (${sessionResults.wrongCards.length})`;
+    } else {
+      practiceWrongBtn.classList.add("hidden");
+    }
+  }
+  
   // Update global stats
   updateStats();
+}
+
+// Practice only wrong cards from last session
+function practiceWrongCards() {
+  if (sessionResults.wrongCards.length === 0) {
+    alert("Keine falschen Vokabeln zum Wiederholen.");
+    return;
+  }
+  
+  currentPracticeCards = [...sessionResults.wrongCards].sort(() => Math.random() - 0.5);
+  currentCardIndex = 0;
+  sessionResults = { known: 0, unknown: 0, wrongCards: [] };
+  
+  showPracticeView();
+  
+  const practiceContainer = document.querySelector(".practice-container");
+  const resultsViewEl = document.getElementById("results-view");
+  if (practiceContainer) practiceContainer.classList.remove("hidden");
+  if (resultsViewEl) resultsViewEl.classList.add("hidden");
+  
+  showCard();
 }
