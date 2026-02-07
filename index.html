@@ -42,6 +42,12 @@
         </div>
       </div>
 
+      <!-- Lesson Progress -->
+      <div class="lesson-stats-section">
+        <h3>📊 Fortschritt nach Lektion</h3>
+        <div id="lesson-stats" class="lesson-stats"></div>
+      </div>
+
       <!-- Start Button -->
       <div class="center">
         <button class="btn btn-primary btn-large" id="start-btn">
@@ -102,6 +108,7 @@
             <div class="flashcard-back">
               <div class="card-label">Deutsch</div>
               <div class="card-word" id="german-word">-</div>
+              <div class="card-forms-back" id="german-forms"></div>
             </div>
           </div>
         </div>
@@ -134,6 +141,7 @@
             <span id="result-percentage">0%</span> Erfolgsquote
           </div>
           <div class="result-actions">
+            <button class="btn btn-warning hidden" id="practice-wrong-btn">🔄 Falsche wiederholen</button>
             <button class="btn btn-secondary" id="practice-again-btn">Nochmal üben</button>
             <button class="btn btn-primary" id="back-home-btn">Zur Übersicht</button>
           </div>
