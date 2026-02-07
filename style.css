@@ -513,3 +513,74 @@ header h1 {
     flex-direction: column;
   }
 }
+
+/* Lesson Stats Section */
+.lesson-stats-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  margin: 2rem 0;
+}
+
+.lesson-stats-section h3 {
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+}
+
+.lesson-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.lesson-stat-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.lesson-stat-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+}
+
+.lesson-stat-name {
+  font-weight: 500;
+}
+
+.lesson-stat-numbers {
+  color: var(--text-muted);
+}
+
+.lesson-stat-bar {
+  height: 8px;
+  background: var(--background);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.lesson-stat-fill {
+  height: 100%;
+  background: var(--success);
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+.no-stats {
+  color: var(--text-muted);
+  font-style: italic;
+  text-align: center;
+  padding: 1rem;
+}
+
+/* Warning Button */
+.btn-warning {
+  background: #f59e0b;
+  color: white;
+}
+
+.btn-warning:hover {
+  background: #d97706;
+}
