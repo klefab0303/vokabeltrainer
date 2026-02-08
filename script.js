@@ -64,29 +64,37 @@ function updateStats() {
 }
 
 function updateLessonStats() {
-  const lessonStatsContainer = document.getElementById("lesson-stats");
-  if (!lessonStatsContainer) return;
+  // This function is kept for compatibility but chart is rendered separately
+}
+
+// Stats Modal Functions
+function showStatsModal() {
+  document.getElementById("stats-modal").classList.remove("hidden");
+  renderBarChart();
+}
+
+function hideStatsModal() {
+  document.getElementById("stats-modal").classList.add("hidden");
+}
+
+function renderBarChart() {
+  const chartContainer = document.getElementById("bar-chart");
   
-  // Get unique lessons
+  // Get unique lessons and their stats
   const lessonMap = new Map();
   vocabularies.forEach(v => {
     if (!lessonMap.has(v.lesson_number)) {
       lessonMap.set(v.lesson_number, { total: 0, known: 0, unknown: 0 });
     }
-    const stats = lessonMap.get(v.lesson_number);
-    stats.total++;
+    lessonMap.get(v.lesson_number).total++;
   });
   
-  // Count practice results per lesson (only last result per vocabulary)
-  const lastResultPerVocab = new Map();
+  // Count ALL practice results per lesson (not just last, to show total practice count)
   practiceResults.forEach(r => {
-    lastResultPerVocab.set(r.vocabulary_id, r.known);
-  });
-  
-  vocabularies.forEach(v => {
-    if (lastResultPerVocab.has(v.id)) {
-      const stats = lessonMap.get(v.lesson_number);
-      if (lastResultPerVocab.get(v.id)) {
+    const vocab = vocabularies.find(v => v.id === r.vocabulary_id);
+    if (vocab && lessonMap.has(vocab.lesson_number)) {
+      const stats = lessonMap.get(vocab.lesson_number);
+      if (r.known) {
         stats.known++;
       } else {
         stats.unknown++;
@@ -97,27 +105,37 @@ function updateLessonStats() {
   const lessons = Array.from(lessonMap.entries()).sort((a, b) => a[0] - b[0]);
   
   if (lessons.length === 0) {
-    lessonStatsContainer.innerHTML = '<p class="no-stats">Noch keine Vokabeln geladen.</p>';
+    chartContainer.innerHTML = '<p class="no-stats">Noch keine Vokabeln geladen.</p>';
     return;
   }
   
-  lessonStatsContainer.innerHTML = lessons.map(([num, stats]) => {
-    const practiced = stats.known + stats.unknown;
-    const percentage = practiced > 0 ? Math.round((stats.known / practiced) * 100) : 0;
-    const progressWidth = stats.total > 0 ? Math.round((stats.known / stats.total) * 100) : 0;
-    
-    return `
-      <div class="lesson-stat-row">
-        <div class="lesson-stat-header">
-          <span class="lesson-stat-name">Lektion ${num}</span>
-          <span class="lesson-stat-numbers">${stats.known}/${stats.total} (${progressWidth}%)</span>
-        </div>
-        <div class="lesson-stat-bar">
-          <div class="lesson-stat-fill" style="width: ${progressWidth}%"></div>
-        </div>
+  // Find max value for scaling
+  const maxValue = Math.max(...lessons.map(([_, stats]) => stats.known + stats.unknown), 1);
+  
+  chartContainer.innerHTML = `
+    <div class="chart-container">
+      <div class="chart-y-axis">
+        <span class="y-label">${maxValue}</span>
+        <span class="y-label">${Math.round(maxValue / 2)}</span>
+        <span class="y-label">0</span>
       </div>
-    `;
-  }).join("");
+      <div class="chart-bars">
+        ${lessons.map(([num, stats]) => {
+          const knownHeight = (stats.known / maxValue) * 100;
+          const unknownHeight = (stats.unknown / maxValue) * 100;
+          return `
+            <div class="bar-group">
+              <div class="bar-stack" title="Lektion ${num}: ${stats.known} gewusst, ${stats.unknown} nicht gewusst">
+                <div class="bar known" style="height: ${knownHeight}%"></div>
+                <div class="bar unknown" style="height: ${unknownHeight}%"></div>
+              </div>
+              <span class="bar-label">L${num}</span>
+            </div>
+          `;
+        }).join("")}
+      </div>
+    </div>
+  `;
 }
 
 // Event Listeners
@@ -150,6 +168,11 @@ function setupEventListeners() {
   });
   document.getElementById("practice-wrong-btn").addEventListener("click", practiceWrongCards);
   document.getElementById("back-home-btn").addEventListener("click", showHomeView);
+  
+  // Stats Modal
+  document.getElementById("show-stats-btn").addEventListener("click", showStatsModal);
+  document.getElementById("close-stats-btn").addEventListener("click", hideStatsModal);
+  document.getElementById("stats-modal-overlay").addEventListener("click", hideStatsModal);
 }
 
 // CSV Upload
@@ -398,8 +421,8 @@ function showCard() {
   
   // Update content
   document.getElementById("latin-word").textContent = card.latin_word;
-  document.getElementById("latin-forms").textContent = card.forms || "";
   document.getElementById("german-word").textContent = card.german_translation;
+  document.getElementById("german-forms").textContent = card.forms || "";
   
   // Update progress
   const progress = ((currentCardIndex + 1) / currentPracticeCards.length) * 100;
