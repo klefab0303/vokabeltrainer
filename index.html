@@ -42,10 +42,29 @@
         </div>
       </div>
 
-      <!-- Lesson Progress -->
-      <div class="lesson-stats-section">
-        <h3>📊 Fortschritt nach Lektion</h3>
-        <div id="lesson-stats" class="lesson-stats"></div>
+      <!-- Stats Button -->
+      <div class="center">
+        <button class="btn btn-secondary" id="show-stats-btn">
+          📊 Statistiken anzeigen
+        </button>
+      </div>
+
+      <!-- Stats Modal -->
+      <div id="stats-modal" class="modal hidden">
+        <div class="modal-overlay" id="stats-modal-overlay"></div>
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2>📊 Lektionsstatistik</h2>
+            <button class="btn btn-ghost modal-close" id="close-stats-btn">✕</button>
+          </div>
+          <div class="modal-body">
+            <div id="bar-chart" class="bar-chart"></div>
+            <div class="chart-legend">
+              <span class="legend-item"><span class="legend-color known"></span> Gewusst</span>
+              <span class="legend-item"><span class="legend-color unknown"></span> Nicht gewusst</span>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Start Button -->
@@ -102,7 +121,6 @@
             <div class="flashcard-front">
               <div class="card-label">Latein</div>
               <div class="card-word" id="latin-word">-</div>
-              <div class="card-forms" id="latin-forms"></div>
               <div class="card-hint">Klicken zum Aufdecken</div>
             </div>
             <div class="flashcard-back">
