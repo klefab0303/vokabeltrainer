@@ -27,19 +27,19 @@
       <!-- Stats -->
       <div class="stats-grid" id="stats-container">
         <div class="stat-card">
-          <div class="stat-value" id="stat-total">0</div>
+          <div class="stat-valü" id="stat-total">0</div>
           <div class="stat-label">Vokabeln gesamt</div>
         </div>
         <div class="stat-card">
-          <div class="stat-value" id="stat-practiced">0</div>
-          <div class="stat-label">Geuebt</div>
+          <div class="stat-valü" id="stat-practiced">0</div>
+          <div class="stat-label">Geübt</div>
         </div>
         <div class="stat-card">
-          <div class="stat-value" id="stat-known">0</div>
+          <div class="stat-valü" id="stat-known">0</div>
           <div class="stat-label">Gewusst</div>
         </div>
         <div class="stat-card">
-          <div class="stat-value" id="stat-percentage">0%</div>
+          <div class="stat-valü" id="stat-percentage">0%</div>
           <div class="stat-label">Erfolgsquote</div>
         </div>
       </div>
@@ -72,14 +72,14 @@
       <!-- Start Button -->
       <div class="center">
         <button class="btn btn-primary btn-large" id="start-btn" disabled>
-          Ueben starten
+          üben starten
         </button>
       </div>
 
       <!-- CSV Upload -->
       <div class="upload-section">
         <h3>Vokabeln hochladen</h3>
-        <p>CSV-Datei mit 4 Spalten: Wort, Formen, Deutsche Uebersetzung, Lektionsnummer</p>
+        <p>CSV-Datei mit 4 Spalten: Wort, Formen, Deutsche übersetzung, Lektionsnummer</p>
         <input type="file" id="csv-input" accept=".csv" />
         <div id="upload-status"></div>
       </div>
@@ -87,37 +87,37 @@
       <!-- Preset Vocabularies -->
       <div class="upload-section" style="margin-top: 1rem;">
         <h3>Voreingestellte Vokabeln</h3>
-        <p>Waehle eine Sammlung aus, um sie direkt zu laden:</p>
+        <p>Wähle eine Sammlung aus, um sie direkt zu laden:</p>
         <div id="preset-container" class="preset-grid">
-          <p class="text-muted">Lade verfuegbare Sammlungen...</p>
+          <p class="text-muted">Lade verfügbare Sammlungen...</p>
         </div>
       </div>
     </div>
 
     <!-- Lesson Selection View -->
     <div id="select-view" class="hidden">
-      <button class="btn btn-ghost" id="back-to-home">Zurueck zur Uebersicht</button>
+      <button class="btn btn-ghost" id="back-to-home">Zurück zur übersicht</button>
       
       <div class="lesson-selector">
-        <h2>Lektionen auswaehlen</h2>
-        <p>Waehle die Lektionen aus, die du ueben moechtest:</p>
+        <h2>Lektionen auswählen</h2>
+        <p>Wähle die Lektionen aus, die du üben möchtest:</p>
         
         <div class="lesson-controls">
-          <button class="btn btn-secondary" id="select-all-btn">Alle auswaehlen</button>
-          <button class="btn btn-secondary" id="deselect-all-btn">Alle abwaehlen</button>
+          <button class="btn btn-secondary" id="select-all-btn">Alle auswählen</button>
+          <button class="btn btn-secondary" id="deselect-all-btn">Alle abwählen</button>
         </div>
         
         <div id="lessons-grid" class="lessons-grid"></div>
         
         <button class="btn btn-primary btn-large" id="start-practice-btn" disabled>
-          Ueben starten
+          üben starten
         </button>
       </div>
     </div>
 
     <!-- Practice View -->
     <div id="practice-view" class="hidden">
-      <button class="btn btn-ghost" id="back-to-select">Zurueck zur Auswahl</button>
+      <button class="btn btn-ghost" id="back-to-select">Zurück zur Auswahl</button>
       
       <div class="practice-container">
         <div class="progress-info">
@@ -151,18 +151,18 @@
       <!-- Results -->
       <div id="results-view" class="hidden">
         <div class="results-card">
-          <h2>Uebung abgeschlossen!</h2>
+          <h2>übung abgeschlossen!</h2>
           <div class="results-stats">
             <div class="result-item">
-              <span class="result-value" id="result-total">0</span>
+              <span class="result-valü" id="result-total">0</span>
               <span class="result-label">Vokabeln</span>
             </div>
             <div class="result-item success">
-              <span class="result-value" id="result-known">0</span>
+              <span class="result-valü" id="result-known">0</span>
               <span class="result-label">Gewusst</span>
             </div>
             <div class="result-item danger">
-              <span class="result-value" id="result-unknown">0</span>
+              <span class="result-valü" id="result-unknown">0</span>
               <span class="result-label">Nicht gewusst</span>
             </div>
           </div>
@@ -171,8 +171,8 @@
           </div>
           <div class="result-actions">
             <button class="btn btn-warning hidden" id="practice-wrong-btn">Falsche wiederholen</button>
-            <button class="btn btn-secondary" id="practice-again-btn">Nochmal ueben</button>
-            <button class="btn btn-primary" id="back-home-btn">Zur Uebersicht</button>
+            <button class="btn btn-secondary" id="practice-again-btn">Nochmal üben</button>
+            <button class="btn btn-primary" id="back-home-btn">Zur übersicht</button>
           </div>
         </div>
       </div>
