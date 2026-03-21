@@ -1,7 +1,7 @@
 // LocalStorage Keys
 const VOCABULARIES_KEY = "latin-vocab-vocabularies";
 const PRACTICE_RESULTS_KEY = "latin-vocab-practice-results";
-const VOCABS_FOLDER = "vocabs/";
+const THEME_KEY = "latin-vocab-theme";
 
 // State
 let vocabularies = [];
@@ -22,10 +22,33 @@ document.addEventListener("DOMContentLoaded", () => {
   resultsView = document.getElementById("results-view");
   
   loadData();
+  loadTheme();
   updateStats();
   setupEventListeners();
   loadPresetVocabularies();
 });
+
+// Theme
+function loadTheme() {
+  const saved = localStorage.getItem(THEME_KEY);
+  if (saved === "dark") {
+    document.documentElement.classList.add("dark");
+    updateThemeIcon(true);
+  }
+}
+
+function toggleTheme() {
+  const isDark = document.documentElement.classList.toggle("dark");
+  localStorage.setItem(THEME_KEY, isDark ? "dark" : "light");
+  updateThemeIcon(isDark);
+}
+
+function updateThemeIcon(isDark) {
+  const icon = document.getElementById("theme-icon");
+  if (icon) {
+    icon.innerHTML = isDark ? "&#9728;" : "&#9790;";
+  }
+}
 
 // Data Functions
 function loadData() {
@@ -42,117 +65,6 @@ function saveVocabularies() {
 
 function savePracticeResults() {
   localStorage.setItem(PRACTICE_RESULTS_KEY, JSON.stringify(practiceResults));
-}
-
-// ============ PRESET VOCABULARIES ============
-
-function loadPresetVocabularies() {
-  const presetList = document.getElementById("preset-list");
-  
-  fetch(VOCABS_FOLDER + "manifest.json")
-    .then(response => {
-      if (!response.ok) throw new Error("Manifest nicht gefunden");
-      return response.json();
-    })
-    .then(presets => {
-      if (presets.length === 0) {
-        presetList.innerHTML = '<p class="text-muted">Keine voreingestellten Vokabeln verfügbar.</p>';
-        return;
-      }
-      
-      presetList.innerHTML = presets.map(preset => `
-        <button class="preset-btn" data-file="${preset.file}">${preset.name}
-        </button>
-      `).join("");
-      
-      // Add click handlers
-      presetList.querySelectorAll(".preset-btn").forEach(btn => {
-        btn.addEventListener("click", () => {
-          loadPresetFile(btn.dataset.file, btn);
-        });
-      });
-    })
-    .catch(err => {
-      presetList.innerHTML = '<p class="text-muted">Keine voreingestellten Vokabeln verfügbar.</p>';
-      console.log("Preset-Manifest nicht geladen:", err.message);
-    });
-}
-
-function loadPresetFile(filename, buttonEl) {
-  buttonEl.disabled = true;
-  buttonEl.textContent = "Lade...";
-  
-  fetch(VOCABS_FOLDER + filename)
-    .then(response => {
-      if (!response.ok) throw new Error("Datei nicht gefunden: " + filename);
-      return response.text();
-    })
-    .then(text => {
-      processCSVText(text);
-      buttonEl.textContent = "Geladen!";
-      setTimeout(() => {
-        loadPresetVocabularies(); // Reset button states
-      }, 1500);
-    })
-    .catch(err => {
-      buttonEl.textContent = "Fehler";
-      buttonEl.disabled = false;
-      showUploadStatus("Fehler beim Laden: " + err.message, "error");
-      setTimeout(() => {
-        loadPresetVocabularies();
-      }, 1500);
-    });
-}
-
-// ============ SHARED CSV PROCESSING ============
-
-function processCSVText(text) {
-  try {
-    const lines = text.split("\n").filter(line => line.trim());
-    const startIndex = lines[0].toLowerCase().includes("latein") ? 1 : 0;
-    
-    const newVocabs = [];
-    
-    for (let i = startIndex; i < lines.length; i++) {
-      const line = lines[i].trim();
-      if (!line) continue;
-      
-      const parts = parseCSVLine(line);
-      
-      if (parts.length >= 4) {
-        const lessonStr = parts[parts.length - 1].trim();
-        const lessonNum = parseInt(lessonStr, 10);
-        
-        if (isNaN(lessonNum)) continue;
-        
-        const germanParts = parts.slice(2, parts.length - 1);
-        const germanTranslation = germanParts.join("; ").trim();
-        
-        newVocabs.push({
-          id: generateId(),
-          latin_word: parts[0].trim(),
-          forms: parts[1].trim() || null,
-          german_translation: germanTranslation,
-          lesson_number: lessonNum,
-          created_at: new Date().toISOString()
-        });
-      }
-    }
-    
-    if (newVocabs.length > 0) {
-      vocabularies = newVocabs;
-      practiceResults = [];
-      selectedLessons = [];
-      saveVocabularies();
-      savePracticeResults();
-      updateStats();
-      showUploadStatus("✓ " + newVocabs.length + " Vokabeln erfolgreich geladen!", "success");
-    } else {
-      showUploadStatus("Keine gültigen Vokabeln gefunden.", "error");
-    }
-  } catch (error) {
-    showUploadStatus("Fehler beim Verarbeiten der Datei.", "error");
-  }
 }
 
 // Stats
@@ -174,7 +86,7 @@ function updateStats() {
 
 function updateLessonStats() {}
 
-// Stats Modal Functions
+// Stats Modal
 function showStatsModal() {
   document.getElementById("stats-modal").classList.remove("hidden");
   renderBarChart();
@@ -198,7 +110,8 @@ function renderBarChart() {
     const vocab = vocabularies.find(v => v.id === r.vocabulary_id);
     if (vocab && lessonMap.has(vocab.lesson_number)) {
       const stats = lessonMap.get(vocab.lesson_number);
-      if (r.known) { stats.known++; } else { stats.unknown++; }
+      if (r.known) stats.known++;
+      else stats.unknown++;
     }
   });
   
@@ -242,40 +155,81 @@ function setupEventListeners() {
   document.getElementById("start-btn").addEventListener("click", showSelectView);
   document.getElementById("back-to-home").addEventListener("click", showHomeView);
   document.getElementById("back-to-select").addEventListener("click", showSelectView);
-  
   document.getElementById("csv-input").addEventListener("change", handleCSVUpload);
-  
   document.getElementById("select-all-btn").addEventListener("click", selectAllLessons);
   document.getElementById("deselect-all-btn").addEventListener("click", deselectAllLessons);
   document.getElementById("start-practice-btn").addEventListener("click", startPractice);
-  
   document.getElementById("flashcard").addEventListener("click", flipCard);
   document.getElementById("known-btn").addEventListener("click", () => answerCard(true));
   document.getElementById("unknown-btn").addEventListener("click", () => answerCard(false));
-  
   document.getElementById("practice-again-btn").addEventListener("click", () => {
-    if (selectedLessons.length === 0) {
-      showSelectView();
-    } else {
-      startPractice();
-    }
+    if (selectedLessons.length === 0) showSelectView();
+    else startPractice();
   });
   document.getElementById("practice-wrong-btn").addEventListener("click", practiceWrongCards);
   document.getElementById("back-home-btn").addEventListener("click", showHomeView);
-  
   document.getElementById("show-stats-btn").addEventListener("click", showStatsModal);
   document.getElementById("close-stats-btn").addEventListener("click", hideStatsModal);
   document.getElementById("stats-modal-overlay").addEventListener("click", hideStatsModal);
+  document.getElementById("theme-toggle").addEventListener("click", toggleTheme);
 }
 
-// CSV Upload (file input)
+// CSV Processing (shared by upload and presets)
+function processCSVText(text) {
+  const lines = text.split("\n").filter(line => line.trim());
+  const startIndex = lines[0].toLowerCase().includes("latein") ? 1 : 0;
+  const newVocabs = [];
+  
+  for (let i = startIndex; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line) continue;
+    const parts = parseCSVLine(line);
+    
+    if (parts.length >= 4) {
+      const lessonStr = parts[parts.length - 1].trim();
+      const lessonNum = parseInt(lessonStr, 10);
+      if (isNaN(lessonNum)) continue;
+      
+      const germanParts = parts.slice(2, parts.length - 1);
+      const germanTranslation = germanParts.join("; ").trim();
+      
+      newVocabs.push({
+        id: generateId(),
+        latin_word: parts[0].trim(),
+        forms: parts[1].trim() || null,
+        german_translation: germanTranslation,
+        lesson_number: lessonNum,
+        created_at: new Date().toISOString()
+      });
+    }
+  }
+  return newVocabs;
+}
+
+// CSV Upload
 function handleCSVUpload(event) {
   const file = event.target.files[0];
   if (!file) return;
   
   const reader = new FileReader();
   reader.onload = (e) => {
-    processCSVText(e.target.result);
+    try {
+      const newVocabs = processCSVText(e.target.result);
+      
+      if (newVocabs.length > 0) {
+        vocabularies = newVocabs;
+        practiceResults = [];
+        selectedLessons = [];
+        saveVocabularies();
+        savePracticeResults();
+        updateStats();
+        showUploadStatus(newVocabs.length + " Vokabeln erfolgreich hochgeladen!", "success");
+      } else {
+        showUploadStatus("Keine gueltigen Vokabeln gefunden.", "error");
+      }
+    } catch (error) {
+      showUploadStatus("Fehler beim Lesen der Datei.", "error");
+    }
   };
   reader.readAsText(file);
 }
@@ -306,7 +260,6 @@ function parseCSVLine(line) {
   if (current.length > 0 || result.length > 0) {
     result.push(current.trim());
   }
-  
   return result.map(s => s.replace(/^"|"$/g, "").trim());
 }
 
@@ -318,6 +271,64 @@ function showUploadStatus(message, type) {
 
 function generateId() {
   return Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
+}
+
+// Preset Vocabularies
+function loadPresetVocabularies() {
+  const container = document.getElementById("preset-container");
+  fetch("vocabs/manifest.json")
+    .then(res => {
+      if (!res.ok) throw new Error("Not found");
+      return res.json();
+    })
+    .then(presets => {
+      if (presets.length === 0) {
+        container.innerHTML = '<p class="text-muted">Keine Sammlungen verfuegbar.</p>';
+        return;
+      }
+      container.innerHTML = presets.map(p =>
+        `<button class="preset-btn" data-file="${p.file}">${p.name}</button>`
+      ).join("");
+      container.querySelectorAll(".preset-btn").forEach(btn => {
+        btn.addEventListener("click", () => loadPresetFile(btn.dataset.file, btn));
+      });
+    })
+    .catch(() => {
+      container.innerHTML = '<p class="text-muted">Keine voreingestellten Sammlungen gefunden.</p>';
+    });
+}
+
+function loadPresetFile(filename, btn) {
+  const originalText = btn.textContent;
+  btn.textContent = "Laden...";
+  btn.disabled = true;
+  
+  fetch("vocabs/" + filename)
+    .then(res => {
+      if (!res.ok) throw new Error("Not found");
+      return res.text();
+    })
+    .then(text => {
+      const newVocabs = processCSVText(text);
+      if (newVocabs.length > 0) {
+        vocabularies = newVocabs;
+        practiceResults = [];
+        selectedLessons = [];
+        saveVocabularies();
+        savePracticeResults();
+        updateStats();
+        showUploadStatus(newVocabs.length + " Vokabeln aus '" + originalText + "' geladen!", "success");
+      } else {
+        showUploadStatus("Keine gueltigen Vokabeln in dieser Datei.", "error");
+      }
+      btn.textContent = originalText;
+      btn.disabled = false;
+    })
+    .catch(() => {
+      showUploadStatus("Fehler beim Laden der Datei.", "error");
+      btn.textContent = originalText;
+      btn.disabled = false;
+    });
 }
 
 // Navigation
@@ -349,9 +360,7 @@ function renderLessons() {
   const lessonMap = new Map();
   
   vocabularies.forEach(v => {
-    if (!lessonMap.has(v.lesson_number)) {
-      lessonMap.set(v.lesson_number, 0);
-    }
+    if (!lessonMap.has(v.lesson_number)) lessonMap.set(v.lesson_number, 0);
     lessonMap.set(v.lesson_number, lessonMap.get(v.lesson_number) + 1);
   });
   
@@ -365,10 +374,7 @@ function renderLessons() {
   `).join("");
   
   document.querySelectorAll(".lesson-item").forEach(item => {
-    item.addEventListener("click", () => {
-      const lesson = parseInt(item.dataset.lesson);
-      toggleLesson(lesson);
-    });
+    item.addEventListener("click", () => toggleLesson(parseInt(item.dataset.lesson)));
   });
   
   updateStartButton();
@@ -376,17 +382,13 @@ function renderLessons() {
 
 function toggleLesson(lesson) {
   const index = selectedLessons.indexOf(lesson);
-  if (index > -1) {
-    selectedLessons.splice(index, 1);
-  } else {
-    selectedLessons.push(lesson);
-  }
+  if (index > -1) selectedLessons.splice(index, 1);
+  else selectedLessons.push(lesson);
   renderLessons();
 }
 
 function selectAllLessons() {
-  const allLessons = [...new Set(vocabularies.map(v => v.lesson_number))];
-  selectedLessons = allLessons;
+  selectedLessons = [...new Set(vocabularies.map(v => v.lesson_number))];
   renderLessons();
 }
 
@@ -396,8 +398,7 @@ function deselectAllLessons() {
 }
 
 function updateStartButton() {
-  const btn = document.getElementById("start-practice-btn");
-  btn.disabled = selectedLessons.length === 0;
+  document.getElementById("start-practice-btn").disabled = selectedLessons.length === 0;
 }
 
 // Practice Mode
@@ -407,7 +408,7 @@ function startPractice() {
     .sort(() => Math.random() - 0.5);
   
   if (currentPracticeCards.length === 0) {
-    alert("Keine Vokabeln in den ausgewählten Lektionen gefunden.");
+    alert("Keine Vokabeln in den ausgewaehlten Lektionen gefunden.");
     return;
   }
   
@@ -442,7 +443,7 @@ function showCard() {
   
   const progress = ((currentCardIndex + 1) / currentPracticeCards.length) * 100;
   document.getElementById("progress-text").textContent = 
-    "Karte " + (currentCardIndex + 1) + " von " + currentPracticeCards.length;
+    `Karte ${currentCardIndex + 1} von ${currentPracticeCards.length}`;
   document.getElementById("progress-fill").style.width = progress + "%";
 }
 
@@ -465,9 +466,8 @@ function answerCard(known) {
   });
   savePracticeResults();
   
-  if (known) {
-    sessionResults.known++;
-  } else {
+  if (known) sessionResults.known++;
+  else {
     sessionResults.unknown++;
     sessionResults.wrongCards.push(card);
   }
