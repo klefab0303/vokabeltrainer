@@ -62,7 +62,7 @@ function loadPresetVocabularies() {
       
       presetList.innerHTML = presets.map(preset => `
         <button class="preset-btn" data-file="${preset.file}">
-          📄 ${preset.name}
+          ${preset.name}
         </button>
       `).join("");
       
