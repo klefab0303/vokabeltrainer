@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vokabeltrainer</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <h1>Vokabeltrainer</h1>
+      <button class="btn btn-ghost theme-toggle" id="theme-toggle" title="Dark Mode umschalten">
+        <span class="theme-icon" id="theme-icon">&#9790;</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Home View -->
+    <div id="home-view">
+      <div class="hero">
+        <h2>Vokabeln trainieren</h2>
+        <p>Lade deine Vokabeln hoch und lerne sie mit Karteikarten-System</p>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-grid" id="stats-container">
+        <div class="stat-card">
+          <div class="stat-value" id="stat-total">0</div>
+          <div class="stat-label">Vokabeln gesamt</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-practiced">0</div>
+          <div class="stat-label">Geuebt</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-known">0</div>
+          <div class="stat-label">Gewusst</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-percentage">0%</div>
+          <div class="stat-label">Erfolgsquote</div>
+        </div>
+      </div>
+
+      <!-- Stats Button -->
+      <div class="center">
+        <button class="btn btn-secondary" id="show-stats-btn">
+          Statistiken anzeigen
+        </button>
+      </div>
+
+      <!-- Stats Modal -->
+      <div id="stats-modal" class="modal hidden">
+        <div class="modal-overlay" id="stats-modal-overlay"></div>
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2>Lektionsstatistik</h2>
+            <button class="btn btn-ghost modal-close" id="close-stats-btn">&times;</button>
+          </div>
+          <div class="modal-body">
+            <div id="bar-chart" class="bar-chart"></div>
+            <div class="chart-legend">
+              <span class="legend-item"><span class="legend-color known"></span> Gewusst</span>
+              <span class="legend-item"><span class="legend-color unknown"></span> Nicht gewusst</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Start Button -->
+      <div class="center">
+        <button class="btn btn-primary btn-large" id="start-btn" disabled>
+          Ueben starten
+        </button>
+      </div>
+
+      <!-- CSV Upload -->
+      <div class="upload-section">
+        <h3>Vokabeln hochladen</h3>
+        <p>CSV-Datei mit 4 Spalten: Wort, Formen, Deutsche Uebersetzung, Lektionsnummer</p>
+        <input type="file" id="csv-input" accept=".csv" />
+        <div id="upload-status"></div>
+      </div>
+
+      <!-- Preset Vocabularies -->
+      <div class="upload-section" style="margin-top: 1rem;">
+        <h3>Voreingestellte Vokabeln</h3>
+        <p>Waehle eine Sammlung aus, um sie direkt zu laden:</p>
+        <div id="preset-container" class="preset-grid">
+          <p class="text-muted">Lade verfuegbare Sammlungen...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lesson Selection View -->
+    <div id="select-view" class="hidden">
+      <button class="btn btn-ghost" id="back-to-home">Zurueck zur Uebersicht</button>
+      
+      <div class="lesson-selector">
+        <h2>Lektionen auswaehlen</h2>
+        <p>Waehle die Lektionen aus, die du ueben moechtest:</p>
+        
+        <div class="lesson-controls">
+          <button class="btn btn-secondary" id="select-all-btn">Alle auswaehlen</button>
+          <button class="btn btn-secondary" id="deselect-all-btn">Alle abwaehlen</button>
+        </div>
+        
+        <div id="lessons-grid" class="lessons-grid"></div>
+        
+        <button class="btn btn-primary btn-large" id="start-practice-btn" disabled>
+          Ueben starten
+        </button>
+      </div>
+    </div>
+
+    <!-- Practice View -->
+    <div id="practice-view" class="hidden">
+      <button class="btn btn-ghost" id="back-to-select">Zurueck zur Auswahl</button>
+      
+      <div class="practice-container">
+        <div class="progress-info">
+          <span id="progress-text">Karte 1 von 10</span>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill"></div>
+          </div>
+        </div>
+
+        <div class="flashcard" id="flashcard">
+          <div class="flashcard-inner" id="flashcard-inner">
+            <div class="flashcard-front">
+              <div class="card-label">Latein</div>
+              <div class="card-word" id="latin-word">-</div>
+              <div class="card-hint">Klicken zum Aufdecken</div>
+            </div>
+            <div class="flashcard-back">
+              <div class="card-label">Deutsch</div>
+              <div class="card-word" id="german-word">-</div>
+              <div class="card-forms-back" id="german-forms"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="answer-buttons hidden" id="answer-buttons">
+          <button class="btn btn-danger" id="unknown-btn">Nicht gewusst</button>
+          <button class="btn btn-success" id="known-btn">Gewusst</button>
+        </div>
+      </div>
+
+      <!-- Results -->
+      <div id="results-view" class="hidden">
+        <div class="results-card">
+          <h2>Uebung abgeschlossen!</h2>
+          <div class="results-stats">
+            <div class="result-item">
+              <span class="result-value" id="result-total">0</span>
+              <span class="result-label">Vokabeln</span>
+            </div>
+            <div class="result-item success">
+              <span class="result-value" id="result-known">0</span>
+              <span class="result-label">Gewusst</span>
+            </div>
+            <div class="result-item danger">
+              <span class="result-value" id="result-unknown">0</span>
+              <span class="result-label">Nicht gewusst</span>
+            </div>
+          </div>
+          <div class="result-percentage">
+            <span id="result-percentage">0%</span> Erfolgsquote
+          </div>
+          <div class="result-actions">
+            <button class="btn btn-warning hidden" id="practice-wrong-btn">Falsche wiederholen</button>
+            <button class="btn btn-secondary" id="practice-again-btn">Nochmal ueben</button>
+            <button class="btn btn-primary" id="back-home-btn">Zur Uebersicht</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
