@@ -81,7 +81,7 @@ function loadPresetVocabularies() {
 
 function loadPresetFile(filename, buttonEl) {
   buttonEl.disabled = true;
-  buttonEl.textContent = "⏳ Lade...";
+  buttonEl.textContent = "Lade...";
   
   fetch(VOCABS_FOLDER + filename)
     .then(response => {
@@ -90,13 +90,13 @@ function loadPresetFile(filename, buttonEl) {
     })
     .then(text => {
       processCSVText(text);
-      buttonEl.textContent = "✅ Geladen!";
+      buttonEl.textContent = "Geladen!";
       setTimeout(() => {
         loadPresetVocabularies(); // Reset button states
       }, 1500);
     })
     .catch(err => {
-      buttonEl.textContent = "❌ Fehler";
+      buttonEl.textContent = "Fehler";
       buttonEl.disabled = false;
       showUploadStatus("Fehler beim Laden: " + err.message, "error");
       setTimeout(() => {
@@ -497,7 +497,7 @@ function showResults() {
   if (practiceWrongBtn) {
     if (sessionResults.wrongCards.length > 0) {
       practiceWrongBtn.classList.remove("hidden");
-      practiceWrongBtn.textContent = "🔄 Falsche wiederholen (" + sessionResults.wrongCards.length + ")";
+      practiceWrongBtn.textContent = "Falsche wiederholen (" + sessionResults.wrongCards.length + ")";
     } else {
       practiceWrongBtn.classList.add("hidden");
     }
