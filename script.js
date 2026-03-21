@@ -225,7 +225,7 @@ function handleCSVUpload(event) {
         updateStats();
         showUploadStatus(newVocabs.length + " Vokabeln erfolgreich hochgeladen!", "success");
       } else {
-        showUploadStatus("Keine gültigen Vokabeln gefunden.", "error");
+        showUploadStatus("Keine gueltigen Vokabeln gefunden.", "error");
       }
     } catch (error) {
       showUploadStatus("Fehler beim Lesen der Datei.", "error");
@@ -283,7 +283,7 @@ function loadPresetVocabularies() {
     })
     .then(presets => {
       if (presets.length === 0) {
-        container.innerHTML = '<p class="text-muted">Keine Sammlungen verfügbar.</p>';
+        container.innerHTML = '<p class="text-muted">Keine Sammlungen verfuegbar.</p>';
         return;
       }
       container.innerHTML = presets.map(p =>
@@ -319,7 +319,7 @@ function loadPresetFile(filename, btn) {
         updateStats();
         showUploadStatus(newVocabs.length + " Vokabeln aus '" + originalText + "' geladen!", "success");
       } else {
-        showUploadStatus("Keine gültigen Vokabeln in dieser Datei.", "error");
+        showUploadStatus("Keine gueltigen Vokabeln in dieser Datei.", "error");
       }
       btn.textContent = originalText;
       btn.disabled = false;
@@ -408,7 +408,7 @@ function startPractice() {
     .sort(() => Math.random() - 0.5);
   
   if (currentPracticeCards.length === 0) {
-    alert("Keine Vokabeln in den ausgewählten Lektionen gefunden.");
+    alert("Keine Vokabeln in den ausgewaehlten Lektionen gefunden.");
     return;
   }
   
