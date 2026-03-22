@@ -1,8 +1,8 @@
 // ============================================================
 // CONFIG – Trage hier deine Supabase-Daten ein
 // ============================================================
-const SUPABASE_URL = 'DEINE_SUPABASE_URL';
-const SUPABASE_ANON_KEY = 'DEIN_SUPABASE_ANON_KEY';
+const SUPABASE_URL = 'https://jxkupplncsmextsfrlbz.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4a3VwcGxuY3NtZXh0c2ZybGJ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwOTY3NjcsImV4cCI6MjA4OTY3Mjc2N30.32M4Pf1-w_9qSE4e9ALpzYdYzyWCeOM_hc_LA1OARJs';
 
 const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
